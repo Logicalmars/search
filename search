@@ -4,6 +4,7 @@ import sys
 import curses
 import os
 import locale
+import platform
 args = sys.argv
 locale.setlocale(locale.LC_ALL,'en_US.UTF-8')
 MAX_ENTRY_COUNT = 4096
@@ -86,7 +87,7 @@ def select(results): #{{{
 #}}}
 
 def invoke_search_backend(target):#{{{
-    
+
     if os.system("command -v mdfind > /dev/null") == 0:
         pipe = os.popen('mdfind '+target+' | head -n '+str(MAX_ENTRY_COUNT))
         return pipe.readlines()
@@ -117,7 +118,10 @@ def search(tmp, target, cmd):#{{{
         return
 
     if cmd == '':
-        cmd = 'open'
+        if platform.system() == 'Linux':
+            cmd = 'xdg-open'
+        else:
+            cmd = 'open'
 
     cmd_string = cmd+' "'+ret[choice].strip() + '"'
     cmd_file = open(tmp, "w")
